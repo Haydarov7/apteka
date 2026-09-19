@@ -9,6 +9,10 @@
 <meta name="apple-mobile-web-app-title" content="Склад аптеки">
 <link rel="manifest" href="manifest.json">
 <title>Склад аптеки</title>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;700&display=swap" rel="stylesheet">
@@ -417,6 +421,86 @@
 <input id="restoreFileInput" type="file" accept=".json" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">
 
 <script>
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBlUbFSJ7kKPYNOZRqFkz5Qu-3cTwSHd34",
+  authDomain: "apteka-6a804.firebaseapp.com",
+  projectId: "apteka-6a804",
+  storageBucket: "apteka-6a804.firebasestorage.app",
+  messagingSenderId: "399975021862",
+  appId: "1:399975021862:web:7ffc627614a41f2ee655e7",
+  measurementId: "G-5NFV06JGLL"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const analytics = firebase.analytics();
+
+// Firestore collections
+const COLLECTIONS = {
+  meds: "medicines",
+  sales: "sales",
+  settings: "settings",
+  priceRequests: "price_requests",
+  sellers: "sellers",
+  sessions: "sessions",
+  logs: "activity_logs"
+};
+
+// Helper to convert Firestore doc to plain object
+function docToObj(doc) {
+  if (!doc.exists) return null;
+  return { id: doc.id, ...doc.data() };
+}
+
+// Load data from Firestore with localStorage fallback
+async function loadFromFirestore(key, fallback) {
+  try {
+    const collectionName = COLLECTIONS[key] || key;
+    const snapshot = await db.collection(collectionName).get();
+    if (snapshot.empty) return fallback;
+    const data = [];
+    snapshot.forEach(doc => data.push(docToObj(doc)));
+    return data.length > 0 ? data : fallback;
+  } catch(e) {
+    console.warn("Firestore load error, using localStorage:", e);
+    return load(key, fallback);
+  }
+}
+
+// Save data to Firestore with localStorage fallback
+async function saveToFirestore(key, val) {
+  try {
+    const collectionName = COLLECTIONS[key] || key;
+    const collectionRef = db.collection(collectionName);
+    
+    // Clear existing data and write new
+    const batch = db.batch();
+    const existingSnapshot = await collectionRef.get();
+    existingSnapshot.forEach(doc => batch.delete(doc.ref));
+    
+    if (Array.isArray(val)) {
+      val.forEach(item => {
+        const docRef = item.id ? collectionRef.doc(item.id) : collectionRef.doc();
+        const dataWithoutId = { ...item };
+        delete dataWithoutId.id;
+        batch.set(docRef, dataWithoutId);
+      });
+    } else {
+      const docRef = collectionRef.doc(key);
+      batch.set(docRef, val);
+    }
+    
+    await batch.commit();
+    // Also save to localStorage as cache
+    save(key, val);
+  } catch(e) {
+    console.warn("Firestore save error, using localStorage:", e);
+    save(key, val);
+  }
+}
+
 const DEFAULT_CATEGORIES = [
   "Витамины и БАДы",
   "Сердце и сосуды",
@@ -609,7 +693,8 @@ let state = {
   }
 };
 
-function persist() {
+async function persist() {
+  // Save to Firestore in background, localStorage as immediate cache
   save(KEYS.meds, state.meds);
   save(KEYS.sales, state.sales);
   save(KEYS.settings, state.settings);
@@ -617,6 +702,15 @@ function persist() {
   save(KEYS.sellers, state.sellers);
   save(KEYS.sessions, state.sessions);
   save(KEYS.logs, state.logs);
+  
+  // Sync to Firestore asynchronously
+  saveToFirestore(KEYS.meds, state.meds).catch(console.error);
+  saveToFirestore(KEYS.sales, state.sales).catch(console.error);
+  saveToFirestore(KEYS.settings, state.settings).catch(console.error);
+  saveToFirestore(KEYS.priceRequests, state.priceRequests).catch(console.error);
+  saveToFirestore(KEYS.sellers, state.sellers).catch(console.error);
+  saveToFirestore(KEYS.sessions, state.sessions).catch(console.error);
+  saveToFirestore(KEYS.logs, state.logs).catch(console.error);
 }
 
 function getCurrency() { return state.settings.currency || "с."; }
@@ -2327,8 +2421,37 @@ document.getElementById("restoreFileInput").addEventListener("change", (e) => {
   reader.readAsText(file);
 });
 
-// Initial render
-render();
+// Initial render - load from Firestore first, then fallback to localStorage
+(async function init() {
+  try {
+    // Try loading from Firestore first
+    const [meds, sales, settings, priceRequests, sellers, sessions, logs] = await Promise.all([
+      loadFromFirestore(KEYS.meds, null),
+      loadFromFirestore(KEYS.sales, null),
+      loadFromFirestore(KEYS.settings, null),
+      loadFromFirestore(KEYS.priceRequests, null),
+      loadFromFirestore(KEYS.sellers, null),
+      loadFromFirestore(KEYS.sessions, null),
+      loadFromFirestore(KEYS.logs, null)
+    ]);
+    
+    // If we got data from Firestore, use it
+    if (meds !== null) state.meds = meds;
+    if (sales !== null) state.sales = sales;
+    if (settings !== null) state.settings = settings;
+    if (priceRequests !== null) state.priceRequests = priceRequests;
+    if (sellers !== null) state.sellers = sellers;
+    if (sessions !== null) state.sessions = sessions;
+    if (logs !== null) state.logs = logs;
+    
+    console.log("Firebase Firestore connected successfully!");
+  } catch(e) {
+    console.warn("Using localStorage data:", e);
+  }
+  
+  // Initial render
+  render();
+})();
 </script>
 </body>
 </html>

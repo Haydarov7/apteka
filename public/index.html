@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1F4B43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Склад аптеки">
+<link rel="manifest" href="manifest.json">
+<title>Склад аптеки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --pine: #1F4B43;
+    --pine-deep: #143630;
+    --pine-light: #2E6358;
+    --sage: #7FA593;
+    --sage-tint: #E8F1EC;
+    --cream: #F8F9FA;
+    --ink: #1E293B;
+    --muted: #64748B;
+    --line: #E2E8F0;
+    --purple-btn: #5A35E0;
+    --purple-hover: #4826C7;
+    --telegram: #0088CC;
+    --telegram-hover: #0077B5;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-soft: 0 2px 10px rgba(0,0,0,0.04);
+    --shadow-card: 0 4px 14px rgba(0,0,0,0.06);
+    --shadow-lift: 0 10px 28px rgba(23,55,48,.16);
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  input, select, button, textarea { font-family: inherit; }
+  
+  header {
+    background: radial-gradient(130% 160% at 12% -20%, var(--pine-light) 0%, var(--pine) 50%, var(--pine-deep) 100%);
+    color: #EAF3EF;
+    padding: 1.15rem 1.25rem 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  header .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  header h1 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  header .sub { margin: 3px 0 0; font-size: 13px; color: #BFDBD0; }
+  .icon-btn {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    color: #EAF3EF;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .icon-btn:active { transform: scale(.93); background: rgba(255,255,255,.26); }
+  .tg-header-btn {
+    background: #0088CC;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s ease, transform .1s ease;
+    box-shadow: 0 2px 8px rgba(0,136,204,0.3);
+  }
+  .tg-header-btn:hover { background: #0077B5; }
+  .tg-header-btn:active { transform: scale(.95); }
+
+  .header-actions { display: flex; gap: 7px; align-items: center; }
+  
+  .search-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-size: 15px;
+    margin-top: 1rem;
+    background: #fff;
+    color: var(--ink);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .chips { display: flex; gap: 8px; margin-top: 11px; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.1);
+    color: #EAF3EF;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease;
+  }
+  .chip.active { background: #fff; color: var(--pine-deep); border-color: transparent; }
+
+  main { padding: 1.25rem 1rem 7rem; max-width: 780px; margin: 0 auto; }
+  .group-title { font-size: 13.5px; font-weight: 700; color: var(--muted); margin: 0 4px 10px; text-transform: uppercase; letter-spacing: .03em; }
+  .group { margin-bottom: 24px; }
+
+  /* Salomat.tj Inspired Product Cards */
+  .med-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-soft);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    cursor: pointer;
+  }
+  .med-card:hover { box-shadow: var(--shadow-card); border-color: #CBD5E1; }
+  .med-card:active { transform: scale(.99); }
+  
+  .med-img-box {
+    width: 105px;
+    height: 105px;
+    border-radius: 12px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .med-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+    transition: transform .2s ease;
+  }
+  .med-card:hover .med-img-box img { transform: scale(1.05); }
+  .med-img-empty { font-size: 40px; display: flex; align-items: center; justify-content: center; }
+
+  .med-info { flex: 1; min-width: 0; }
+  .med-name {
+    font-size: 16.5px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .med-props {
+    font-size: 12.5px;
+    color: #64748B;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .med-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .badge-stock {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #E8F5E9;
+    color: #2E7D32;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .badge-stock.low { background: #FFF3E0; color: #E65100; }
+  .badge-stock.empty { background: #FFEBEE; color: #C62828; }
+  .badge-added-by {
+    font-size: 11px;
+    color: var(--muted);
+    background: #F1F5F9;
+    padding: 3px 7px;
+    border-radius: 6px;
+  }
+
+  .med-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .med-price-wrap { text-align: right; }
+  .med-price-label { font-size: 11.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .med-price {
+    font-size: 19px;
+    font-weight: 800;
+    color: #0F172A;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .btn-sell-direct {
+    background: var(--purple-btn);
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(90, 53, 224, 0.25);
+    transition: background .15s ease, transform .1s ease;
+    white-space: nowrap;
+  }
+  .btn-sell-direct:hover { background: var(--purple-hover); }
+  .btn-sell-direct:active { transform: scale(.95); }
+
+  @media (max-width: 540px) {
+    .med-card { padding: 12px; gap: 12px; }
+    .med-img-box { width: 85px; height: 85px; }
+    .med-name { font-size: 15px; }
+    .med-price { font-size: 17px; }
+    .btn-sell-direct { padding: 7px 12px; font-size: 12.5px; }
+  }
+
+  .empty-state { text-align: center; margin-top: 3.5rem; color: var(--muted); font-size: 15px; line-height: 1.6; }
+  .fabs { position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 12px; z-index: 12; }
+  .fab {
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none; transition: transform .1s ease;
+  }
+  .fab:active { transform: scale(.92); }
+  .fab-scan { width: 52px; height: 52px; background: #fff; color: var(--pine); border: 1px solid var(--line); box-shadow: var(--shadow-lift); }
+  .fab-add { width: 58px; height: 58px; background: var(--pine); color: #fff; box-shadow: var(--shadow-lift); font-size: 28px; }
+
+  /* Sheets & Modals */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+    display: flex; align-items: flex-end; justify-content: center; z-index: 25;
+    backdrop-filter: blur(3px);
+  }
+  .sheet {
+    background: #fff; width: 100%; max-width: 520px;
+    border-radius: 24px 24px 0 0; padding: 1.5rem 1.35rem 2.2rem;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+  }
+  .sheet h2 { margin: 0 0 1.1rem; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #0F172A; }
+  label.field-label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 5px; font-weight: 600; }
+  .field-input {
+    width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--line); font-size: 15px; background: #fff; margin-bottom: 12px;
+    transition: border-color .12s ease;
+  }
+  .field-input:focus { outline: none; border-color: var(--purple-btn); }
+  .row { display: flex; gap: 10px; }
+  .row > div { flex: 1; }
+  .btn { padding: 12px; border-radius: var(--radius-sm); font-size: 14.5px; font-weight: 700; cursor: pointer; border: 1px solid var(--line); background: #fff; flex: 1; text-align: center; transition: transform .1s ease, background .12s ease; }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--pine); color: #fff; border: none; }
+  .btn-purple { background: var(--purple-btn); color: #fff; border: none; }
+  .btn-telegram { background: #0088CC; color: #fff; border: none; }
+  .btn-danger { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+  .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+  .error-text { color: #DC2626; font-size: 13px; margin: -4px 0 10px; font-weight: 600; }
+  
+  .photo-dropzone {
+    border: 2px dashed #CBD5E1; border-radius: var(--radius-md); background: #F8FAFC;
+    padding: 16px; text-align: center; margin-bottom: 16px; cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px;
+  }
+  .photo-dropzone:hover { background: #F1F5F9; border-color: var(--purple-btn); }
+  .photo-preview-large {
+    width: 140px; height: 140px; object-fit: contain; border-radius: 10px;
+    background: #fff; border: 1px solid #E2E8F0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 8px;
+  }
+
+  /* Admin Styles */
+  .admin-tabs-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .admin-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 4px 2px 12px;
+    margin-bottom: 0;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    flex: 1;
+    cursor: grab;
+    user-select: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-tabs.dragging { cursor: grabbing; scroll-behavior: auto; }
+  .admin-tabs::-webkit-scrollbar { display: none; }
+  .admin-tab-scroll {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--pine);
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-soft);
+    transition: transform .1s ease, background .12s ease;
+  }
+  .admin-tab-scroll:hover { background: var(--sage-tint); }
+  .admin-tab-scroll:active { transform: scale(.92); }
+  .admin-tab {
+    flex-shrink: 0; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
+    background: #fff; border: 1px solid var(--line); cursor: pointer; color: var(--muted);
+  }
+  .admin-tab.active { background: var(--pine); color: #fff; border-color: var(--pine); }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.1rem; }
+  .stat-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-soft); }
+  .stat-label { font-size: 12px; color: var(--muted); margin: 0 0 5px; font-weight: 700; text-transform: uppercase; }
+  .stat-value { font-size: 20px; font-weight: 800; margin: 0; font-variant-numeric: tabular-nums; }
+  .period-row { display: flex; gap: 6px; margin-bottom: 1.1rem; }
+  .period-btn { flex: 1; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .period-btn.active { background: var(--pine); color: #fff; border-color: var(--pine); }
+  .table-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 10px; box-shadow: var(--shadow-soft); }
+  .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .sale-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .sale-row:last-child { border-bottom: none; }
+  .sale-row .meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .pw-badge { background: #FFF3E0; border: 1px solid #FFE0B2; color: #E65100; font-family: monospace; font-size: 14px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+  .online-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #27AE60; margin-right: 5px; }
+
+  /* Gate Screen */
+  .gate {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem 1.5rem; text-align: center;
+    background: radial-gradient(120% 90% at 50% 0%, #E8F1EC 0%, var(--cream) 55%);
+  }
+  .gate-mark {
+    width: 68px; height: 68px; border-radius: 20px; background: var(--pine);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+    box-shadow: var(--shadow-lift);
+  }
+  .gate h1 { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700; margin: 0 0 6px; color: var(--pine-deep); }
+  .gate p.lede { color: var(--muted); font-size: 14.5px; margin: 0 0 26px; }
+  .role-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
+  .role-card {
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--line);
+    background: #fff; cursor: pointer; box-shadow: var(--shadow-soft);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .role-card:active { transform: scale(.98); }
+  .role-card .role-icon {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    background: var(--sage-tint); color: var(--pine);
+  }
+  .role-card.primary { border-color: var(--pine); border-width: 1.5px; }
+  .role-card.primary .role-icon { background: var(--pine); color: #fff; }
+  .role-card .role-title { font-size: 16px; font-weight: 700; margin: 0; }
+  .role-card .role-sub { font-size: 12.5px; color: var(--muted); margin: 3px 0 0; }
+  .seller-select-btn {
+    width: 100%; text-align: left; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+    background: #fff; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    font-size: 15px; font-weight: 600;
+  }
+  .seller-select-btn.active { border-color: var(--pine); background: var(--sage-tint); color: var(--pine); }
+  .toast {
+    position: fixed; left: 1rem; right: 1rem; bottom: 6.5rem;
+    background: var(--ink); color: #fff; border-radius: var(--radius-md); padding: 13px 16px;
+    font-size: 13.5px; z-index: 30; max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 8px;
+    box-shadow: var(--shadow-lift);
+  }
+  .toast.error { background: #FEE2E2; color: #991B1B; }
+  .toast.success { background: var(--pine); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<input id="fileInput" type="file" accept="image/*" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">
+<input id="medPhotoInput" type="file" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">
+<input id="restoreFileInput" type="file" accept=".json" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">
+
+<script>
+const DEFAULT_CATEGORIES = [
+  "Витамины и БАДы",
+  "Сердце и сосуды",
+  "Простуда и грипп",
+  "Обезболивающие",
+  "Желудок и кишечник",
+  "Мама и малыш",
+  "Лечебные травы",
+  "Косметика и гигиена",
+  "Другое"
+];
+
+const KEYS = {
+  meds: "pharmacy_medicines_v2",
+  sales: "pharmacy_sales_v2",
+  settings: "pharmacy_settings_v2",
+  priceRequests: "pharmacy_price_requests_v2",
+  sellers: "pharmacy_sellers_v2",
+  sessions: "pharmacy_sessions_v2",
+  logs: "pharmacy_activity_log_v2"
+};
+
+const DEFAULT_SELLERS = [
+  { id: "s_1", name: "Продавец 1", pin: "1111", createdAt: Date.now() - 86400000 },
+  { id: "s_2", name: "Продавец 2", pin: "2222", createdAt: Date.now() - 86400000 }
+];
+
+const DEMO_MEDS = [
+  {
+    id: "m_1",
+    name: "Сперовелл Форте тб №30",
+    manufacturer: "Стар фарма",
+    country: "Индия",
+    category: "Витамины и БАДы",
+    price: 116,
+    qty: 24,
+    unit: "уп.",
+    photo: null,
+    addedBy: "Продавец 1",
+    addedAt: Date.now() - 3600000
+  },
+  {
+    id: "m_2",
+    name: "Уравелл капс 50мг №60",
+    manufacturer: "Стар фарма",
+    country: "Индия",
+    category: "Витамины и БАДы",
+    price: 127,
+    qty: 15,
+    unit: "уп.",
+    photo: null,
+    addedBy: "Продавец 1",
+    addedAt: Date.now() - 7200000
+  },
+  {
+    id: "m_3",
+    name: "МультиВелл форте капс №60",
+    manufacturer: "Стар фарма",
+    country: "Индия",
+    category: "Витамины и БАДы",
+    price: 127,
+    qty: 8,
+    unit: "уп.",
+    photo: null,
+    addedBy: "Продавец 2",
+    addedAt: Date.now() - 10800000
+  }
+];
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function load(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    if (!v) return fallback;
+    const parsed = JSON.parse(v);
+    return (Array.isArray(fallback) && !Array.isArray(parsed)) ? fallback : parsed;
+  } catch(e) { return fallback; }
+}
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+
+let initialSellers = load(KEYS.sellers, null);
+if (!initialSellers || initialSellers.length === 0) {
+  initialSellers = DEFAULT_SELLERS;
+  save(KEYS.sellers, initialSellers);
+}
+
+let initialMeds = load(KEYS.meds, null);
+if (!initialMeds || initialMeds.length === 0) {
+  initialMeds = DEMO_MEDS;
+  save(KEYS.meds, initialMeds);
+}
+
+let state = {
+  meds: initialMeds,
+  sales: load(KEYS.sales, []),
+  priceRequests: load(KEYS.priceRequests, []),
+  sellers: initialSellers,
+  sessions: load(KEYS.sessions, []),
+  logs: load(KEYS.logs, []),
+  settings: load(KEYS.settings, {
+    threshold: 10,
+    currency: "с.",
+    sortLowFirst: false,
+    customCategories: [],
+    adminPassword: "admin",
+    masterPassword: "master2024",
+    apiKey: "",
+    // Telegram Bot Settings
+    telegramBotToken: "",
+    telegramChatId: "",
+    telegramNotifySales: true,
+    telegramNotifyNewMeds: true,
+    telegramLastUpdateId: 0
+  }),
+  ui: {
+    query: "",
+    activeCategory: "Все",
+    view: "list",
+    roleChosen: false,
+    currentSeller: null,
+    adminLoggedIn: false,
+
+    // Seller Login
+    showSellerLogin: false,
+    selectedSellerId: initialSellers[0] ? initialSellers[0].id : "",
+    sellerPinInput: "",
+    sellerLoginError: "",
+
+    // Admin Login
+    showAdminLogin: false,
+    adminPasswordInput: "",
+    adminLoginError: "",
+
+    // Admin Password Reset (master password)
+    showAdminReset: false,
+    resetMasterInput: "",
+    resetNewPassword: "",
+    resetError: "",
+
+    // Admin Tabs & Filters
+    adminTab: "overview", // 'overview' | 'sellers' | 'sales_by_seller' | 'supplies' | 'telegram'
+    adminPeriod: "today",
+    adminSellerFilter: "all",
+
+    // Seller CRUD Modal
+    showSellerForm: false,
+    editingSellerId: null,
+    sellerFormName: "",
+    sellerFormPin: "",
+    sellerFormError: "",
+
+    // Medicine Form
+    showForm: false,
+    editingId: null,
+    form: {
+      name: "",
+      manufacturer: "",
+      country: "",
+      price: "",
+      qty: "",
+      unit: "уп.",
+      category: DEFAULT_CATEGORIES[0],
+      photo: null
+    },
+    formError: "",
+    newCategoryMode: false,
+    newCategoryName: "",
+
+    // Fast sell sheet
+    showSellSheet: false,
+    sellingMedId: null,
+    sellQty: "1",
+
+    // Modals
+    showSettings: false,
+    showTelegramModal: false,
+    pwCurrent: "",
+    pwNew: "",
+    pwError: "",
+    masterPwCurrent: "",
+    masterPwNew: "",
+    masterPwError: "",
+
+    // Telegram test modal/state
+    tgTesting: false,
+
+    scanning: false,
+    scanError: "",
+    toastSuccess: ""
+  }
+};
+
+function persist() {
+  save(KEYS.meds, state.meds);
+  save(KEYS.sales, state.sales);
+  save(KEYS.settings, state.settings);
+  save(KEYS.priceRequests, state.priceRequests);
+  save(KEYS.sellers, state.sellers);
+  save(KEYS.sessions, state.sessions);
+  save(KEYS.logs, state.logs);
+}
+
+function getCurrency() { return state.settings.currency || "с."; }
+function fmtPrice(n) {
+  const num = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n || 0);
+  return num + " " + getCurrency();
+}
+function fmtDate(ts) {
+  if (!ts) return "—";
+  return new Date(ts).toLocaleString("ru-RU", { day:"2-digit", month:"2-digit", year:"2-digit", hour:"2-digit", minute:"2-digit" });
+}
+function escapeHtml(s) { return String(s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function isAdmin() { return !!state.ui.adminLoggedIn; }
+function getCurrentUserName() {
+  if (isAdmin()) return "Администратор";
+  if (state.ui.currentSeller) return state.ui.currentSeller.name;
+  return "Продавец";
+}
+function pendingPriceRequestFor(medId) { return state.priceRequests.find(r => r.medicineId === medId); }
+
+function allCategories() {
+  const set = new Set([...DEFAULT_CATEGORIES, ...(state.settings.customCategories || [])]);
+  state.meds.forEach(m => m.category && set.add(m.category));
+  return Array.from(set);
+}
+function categoriesInUse() {
+  const set = new Set(state.meds.map(m => m.category || "Другое"));
+  return allCategories().filter(c => set.has(c));
+}
+function filteredMeds() {
+  let list = state.meds;
+  if (state.ui.activeCategory !== "Все") list = list.filter(m => (m.category||"Другое") === state.ui.activeCategory);
+  if (state.ui.query.trim()) {
+    const q = state.ui.query.trim().toLowerCase();
+    list = list.filter(m =>
+      (m.name && m.name.toLowerCase().includes(q)) ||
+      (m.manufacturer && m.manufacturer.toLowerCase().includes(q)) ||
+      (m.country && m.country.toLowerCase().includes(q))
+    );
+  }
+  list = [...list];
+  if (state.settings.sortLowFirst) list.sort((a,b) => a.qty - b.qty);
+  else list.sort((a,b) => (a.name||"").localeCompare(b.name||"", "ru"));
+  return list;
+}
+function groupedMeds() {
+  const list = filteredMeds();
+  if (state.ui.activeCategory !== "Все") return [[state.ui.activeCategory, list]];
+  const map = new Map();
+  list.forEach(m => {
+    const c = m.category || "Другое";
+    if (!map.has(c)) map.set(c, []);
+    map.get(c).push(m);
+  });
+  return Array.from(map.entries());
+}
+
+function periodStart(period) {
+  const now = new Date();
+  if (period === "today") { const d = new Date(now); d.setHours(0,0,0,0); return d.getTime(); }
+  if (period === "week") return now.getTime() - 7*24*3600*1000;
+  if (period === "month") return now.getTime() - 30*24*3600*1000;
+  return 0;
+}
+function salesInPeriod(period, sellerFilter = "all") {
+  const start = periodStart(period);
+  return state.sales.filter(s => {
+    const inTime = s.timestamp >= start;
+    if (!inTime) return false;
+    if (sellerFilter === "all") return true;
+    return s.sellerId === sellerFilter || s.sellerName === sellerFilter;
+  });
+}
+function totalRevenue(period, sellerFilter = "all") {
+  return salesInPeriod(period, sellerFilter).reduce((sum,s) => sum + s.total, 0);
+}
+function totalUnitsSold(period, sellerFilter = "all") {
+  return salesInPeriod(period, sellerFilter).reduce((sum,s) => sum + s.qty, 0);
+}
+function inventoryValue() {
+  return state.meds.reduce((sum,m) => sum + (m.qty || 0) * (m.price || 0), 0);
+}
+function topSelling(period, sellerFilter = "all") {
+  const map = new Map();
+  salesInPeriod(period, sellerFilter).forEach(s => {
+    map.set(s.name, (map.get(s.name)||0) + s.qty);
+  });
+  return Array.from(map.entries()).sort((a,b) => b[1]-a[1]).slice(0,5);
+}
+
+/* ==================== TELEGRAM BOT API ENGINE ==================== */
+async function tgCall(method, body) {
+  const token = (state.settings.telegramBotToken || "").trim();
+  if (!token) return { ok: false, description: "Не указан Bot Token" };
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    return await res.json();
+  } catch(e) {
+    console.warn("Telegram API error:", e);
+    return { ok: false, description: "network_error: " + (e && e.message ? e.message : e) };
+  }
+}
+
+async function tgSendMessage(text, inlineKeyboard = null) {
+  const chatId = (state.settings.telegramChatId || "").trim();
+  if (!chatId) return { ok: false, description: "Не указан Chat ID" };
+  const payload = {
+    chat_id: chatId,
+    text: text,
+    parse_mode: "HTML"
+  };
+  if (inlineKeyboard) {
+    payload.reply_markup = { inline_keyboard: inlineKeyboard };
+  }
+  return await tgCall("sendMessage", payload);
+}
+
+// Background poller for telegram button clicks and commands
+async function pollTelegram() {
+  const token = (state.settings.telegramBotToken || "").trim();
+  const chatId = (state.settings.telegramChatId || "").trim();
+  if (!token || !chatId) return;
+
+  try {
+    const offset = (state.settings.telegramLastUpdateId || 0) + 1;
+    const res = await tgCall("getUpdates", { offset: offset, timeout: 5, limit: 10 });
+    if (res && res.ok && Array.isArray(res.result) && res.result.length > 0) {
+      for (const update of res.result) {
+        state.settings.telegramLastUpdateId = Math.max(state.settings.telegramLastUpdateId || 0, update.update_id);
+
+        // 1. Handle Callback Query (Button Clicks on Phone)
+        if (update.callback_query) {
+          const cb = update.callback_query;
+          const data = cb.data || "";
+          
+          if (data.startsWith("appr_med_")) {
+            const medId = data.replace("appr_med_", "");
+            const med = state.meds.find(x => x.id === medId);
+            if (med) {
+              med.priceUnconfirmed = false;
+              persist();
+              render();
+              await tgSendMessage(`✅ <b>Одобрено с телефона!</b>\nЛекарство <b>«${escapeHtml(med.name)}»</b> по цене ${fmtPrice(med.price)} подтверждено на кассе.`);
+            }
+          } else if (data.startsWith("rej_med_")) {
+            const medId = data.replace("rej_med_", "");
+            const med = state.meds.find(x => x.id === medId);
+            state.meds = state.meds.filter(x => x.id !== medId);
+            persist();
+            render();
+            await tgSendMessage(`❌ <b>Отклонено с телефона!</b>\nЛекарство <b>«${escapeHtml(med ? med.name : "")}»</b> удалено со склада.`);
+          } else if (data.startsWith("appr_pr_")) {
+            const reqId = data.replace("appr_pr_", "");
+            const r = state.priceRequests.find(x => x.id === reqId);
+            if (r) {
+              const med = state.meds.find(x => x.id === r.medicineId);
+              if (med) med.price = r.newPrice;
+              state.priceRequests = state.priceRequests.filter(x => x.id !== reqId);
+              persist();
+              render();
+              await tgSendMessage(`✅ <b>Новая цена одобрена!</b>\n${escapeHtml(r.name)}: новая цена ${fmtPrice(r.newPrice)}.`);
+            }
+          } else if (data.startsWith("rej_pr_")) {
+            const reqId = data.replace("rej_pr_", "");
+            const r = state.priceRequests.find(x => x.id === reqId);
+            if (r) {
+              state.priceRequests = state.priceRequests.filter(x => x.id !== reqId);
+              persist();
+              render();
+              await tgSendMessage(`❌ <b>Изменение цены отклонено!</b>\n${escapeHtml(r.name)}: цена остаётся ${fmtPrice(r.oldPrice)}.`);
+            }
+          }
+        }
+
+        // 2. Handle Text Commands from Administrator (/stats, /today, etc.)
+        if (update.message && update.message.text) {
+          const text = update.message.text.trim().toLowerCase();
+          if (text === "/stats" || text === "/today" || text.includes("выручк") || text.includes("отчет")) {
+            const rev = totalRevenue("today");
+            const sold = totalUnitsSold("today");
+            const count = salesInPeriod("today").length;
+            
+            let sellerLines = "";
+            state.sellers.forEach(s => {
+              const sum = totalRevenue("today", s.id);
+              const units = totalUnitsSold("today", s.id);
+              if (units > 0) {
+                sellerLines += `\n• <b>${escapeHtml(s.name)}:</b> ${fmtPrice(sum)} (${units} шт.)`;
+              }
+            });
+
+            const reply = `📊 <b>Отчет аптеки за сегодня:</b>\n` +
+              `💰 <b>Общая выручка:</b> ${fmtPrice(rev)}\n` +
+              `📦 <b>Продано упаковок:</b> ${sold} шт.\n` +
+              `🧾 <b>Всего чеков:</b> ${count} шт.\n` +
+              (sellerLines ? `\n👥 <b>По сотрудникам:</b>${sellerLines}` : "");
+            
+            await tgSendMessage(reply);
+          } else if (text === "/low" || text.includes("мало") || text.includes("остатк")) {
+            const lowMeds = state.meds.filter(m => m.qty <= state.settings.threshold);
+            if (lowMeds.length === 0) {
+              await tgSendMessage("✅ Все лекарства в достаточном количестве!");
+            } else {
+              const list = lowMeds.slice(0, 15).map(m => `• <b>${escapeHtml(m.name)}</b>: осталось ${m.qty} ${escapeHtml(m.unit)}`).join("\n");
+              await tgSendMessage(`⚠️ <b>Мало на складе:</b>\n${list}`);
+            }
+          } else if (text === "/start" || text === "/help") {
+            await tgSendMessage(
+              `👋 <b>Здравствуйте, Администратор!</b>\n\n` +
+              `Бот подключен к вашей аптеке.\n` +
+              `Команды с телефона:\n` +
+              `• /stats — выручка за сегодня и продажи по продавцам\n` +
+              `• /low — список лекарств с малым остатком\n\n` +
+              `<i>Когда продавцы будут добавлять новые лекарства, вам сразу будут приходить кнопки для одобрения прямо сюда!</i>`
+            );
+          }
+        }
+      }
+      persist();
+    }
+  } catch(e) {}
+}
+
+setInterval(pollTelegram, 4000);
+
+/* ==================== RENDERING ==================== */
+function render() {
+  const app = document.getElementById("app");
+  if (!state.ui.roleChosen) {
+    app.innerHTML = renderRoleGate() + renderModals();
+    return;
+  }
+  if (state.ui.view === "admin") {
+    app.innerHTML = renderAdmin() + renderModals();
+    return;
+  }
+  app.innerHTML = renderHeader() + renderList() + renderFabs() + renderModals();
+}
+
+function renderRoleGate() {
+  const tgConnected = !!(state.settings.telegramBotToken && state.settings.telegramChatId);
+  return `
+  <div class="gate">
+    <div class="gate-mark">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#EAF3EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
+        <path d="m8.5 8.5 7 7"></path>
+      </svg>
+    </div>
+    <h1>Склад аптеки</h1>
+    <p class="lede">Каталог и касса медикаментов</p>
+    <div class="role-stack">
+      <div class="role-card primary" onclick="app.openSellerLogin()">
+        <div class="role-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div>
+          <p class="role-title">Вход продавца</p>
+          <p class="role-sub">Вход по коду / продажа и остатки</p>
+        </div>
+      </div>
+      <div class="role-card" onclick="app.chooseRoleAdmin()">
+        <div class="role-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="role-title">Администратор</p>
+          <p class="role-sub">Пароли продавцов, отчеты, цены</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderHeader() {
+  const lowCount = state.meds.filter(m => m.qty <= state.settings.threshold).length;
+  const cats = categoriesInUse();
+  const admin = isAdmin();
+  const seller = state.ui.currentSeller;
+  const tgConnected = !!(state.settings.telegramBotToken && state.settings.telegramChatId);
+
+  return `
+  <header>
+    <div class="top-row">
+      <div>
+        <h1>Склад аптеки</h1>
+        <div class="sub">
+          ${admin ? `Режим: <strong>Администратор</strong>` : `Продавец: <strong>${escapeHtml(seller ? seller.name : "Продавец")}</strong>`} · ${state.meds.length} товаров${lowCount>0 ? " · <span style='color:#FFE0B2;'>"+lowCount+" мало</span>" : ""}
+        </div>
+      </div>
+      <div class="header-actions">
+        ${admin ? `
+          <button class="icon-btn" onclick="app.openAdminPanel()" title="Панель администратора">📊</button>
+        ` : ""}
+        <button class="icon-btn" onclick="app.openSettings()" title="Настройки">⚙</button>
+        <button class="icon-btn" onclick="app.logout()" title="Выйти из системы">🚪</button>
+      </div>
+    </div>
+    <input class="search-input" placeholder="Поиск по названию, производителю или стране..." value="${escapeHtml(state.ui.query)}" oninput="app.setQuery(this.value)">
+    ${cats.length ? `<div class="chips">
+      ${["Все", ...cats].map(c => `<button class="chip ${state.ui.activeCategory===c?'active':''}" onclick="app.setCategory('${escapeHtml(c).replace(/'/g,"\\'")}')">${escapeHtml(c)}</button>`).join("")}
+    </div>` : ""}
+  </header>`;
+}
+
+function renderList() {
+  const groups = groupedMeds();
+  const totalShown = groups.reduce((s,[,items]) => s+items.length, 0);
+  let body;
+  if (state.meds.length === 0) {
+    body = `<div class="empty-state">В аптеке пока нет лекарств.<br>Нажмите <strong>+</strong> снизу, чтобы добавить первое лекарство с фото!</div>`;
+  } else if (totalShown === 0) {
+    body = `<div class="empty-state">По запросу «${escapeHtml(state.ui.query)}» ничего не найдено.</div>`;
+  } else {
+    body = groups.map(([cat, items]) => `
+      <div class="group">
+        ${state.ui.activeCategory==="Все" ? `<div class="group-title">${escapeHtml(cat)} (${items.length})</div>` : ""}
+        ${items.map(m => {
+          const low = m.qty <= state.settings.threshold;
+          const empty = m.qty <= 0;
+          const pendingReq = pendingPriceRequestFor(m.id);
+          const pendingNote = m.priceUnconfirmed
+            ? `<span style="color:#C77D2E;font-weight:700;font-size:11px;">⏳ Цена ожидает одобрения</span>`
+            : (pendingReq ? `<span style="color:#C77D2E;font-weight:700;font-size:11px;">⏳ Изменение цены на проверке</span>` : "");
+
+          return `
+          <div class="med-card" onclick="app.openItem('${m.id}')">
+            <!-- Large Product Image -->
+            <div class="med-img-box">
+              ${m.photo 
+                ? `<img src="${m.photo}" alt="${escapeHtml(m.name)}">`
+                : `<div class="med-img-empty">💊</div>`
+              }
+            </div>
+
+            <!-- Product Details -->
+            <div class="med-info">
+              <div class="med-name">${escapeHtml(m.name)}</div>
+              <div class="med-props">
+                ${m.manufacturer ? `<div>Производитель: <strong>${escapeHtml(m.manufacturer)}</strong></div>` : ""}
+                ${m.country ? `<div>Страна: <strong>${escapeHtml(m.country)}</strong></div>` : ""}
+              </div>
+              <div class="med-badges">
+                <span class="badge-stock ${empty ? 'empty' : (low ? 'low' : '')}">
+                  ${empty ? "Нет в наличии" : (low ? `Мало: ${m.qty} ${escapeHtml(m.unit)}` : `В наличии: ${m.qty} ${escapeHtml(m.unit)}`)}
+                </span>
+                ${m.addedBy ? `<span class="badge-added-by">доб: ${escapeHtml(m.addedBy)}</span>` : ""}
+                ${pendingNote}
+              </div>
+            </div>
+
+            <!-- Price & Fast Sell Button -->
+            <div class="med-right" onclick="event.stopPropagation()">
+              <div class="med-price-wrap">
+                <div class="med-price-label">Цена</div>
+                <div class="med-price">${fmtPrice(m.price)}</div>
+              </div>
+              <button class="btn-sell-direct" onclick="app.openFastSell('${m.id}')" ${empty ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+                Продать
+              </button>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>`).join("");
+  }
+  return `<main>${body}</main>`;
+}
+
+function renderFabs() {
+  return `
+  <div class="fabs">
+    <button class="fab fab-scan" onclick="app.startScan()" aria-label="Распознать по фото" ${state.ui.scanning?"disabled":""}>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+      </svg>
+    </button>
+    <button class="fab fab-add" onclick="app.openAddForm()" aria-label="Добавить">+</button>
+  </div>`;
+}
+
+/* ==================== FAST SELL MODAL ==================== */
+function renderFastSellModal() {
+  const m = state.meds.find(x => x.id === state.ui.sellingMedId);
+  if (!m) return "";
+  const currentSeller = state.ui.currentSeller;
+  const sellerName = currentSeller ? currentSeller.name : "Администратор";
+
+  return `
+  <div class="overlay" onclick="app.closeFastSell()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h2>Продажа лекарства</h2>
+      
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:12px;background:#F8FAFC;border-radius:12px;border:1px solid var(--line);">
+        <div style="width:65px;height:65px;border-radius:10px;background:#fff;border:1px solid #E2E8F0;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+          ${m.photo ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:contain;">` : `<span style="font-size:28px;">💊</span>`}
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:700;">${escapeHtml(m.name)}</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px;">В наличии: <strong>${m.qty} ${escapeHtml(m.unit)}</strong> · Цена: <strong>${fmtPrice(m.price)}</strong></div>
+          <div style="font-size:12px;color:var(--pine);margin-top:2px;">Кассир: <strong>${escapeHtml(sellerName)}</strong></div>
+        </div>
+      </div>
+
+      <label class="field-label">Количество для продажи (${escapeHtml(m.unit)})</label>
+      <input class="field-input" type="number" min="1" max="${m.qty}" value="${escapeHtml(state.ui.sellQty)}" oninput="app.setSellQty(this.value)">
+
+      <div style="font-size:17px;font-weight:800;color:#0F172A;margin-bottom:16px;text-align:right;">
+        Итого к оплате: <span style="color:var(--purple-btn);">${fmtPrice((parseFloat(state.ui.sellQty)||1) * m.price)}</span>
+      </div>
+
+      ${state.ui.formError ? `<p class="error-text">${escapeHtml(state.ui.formError)}</p>` : ""}
+
+      <div class="btn-row">
+        <button class="btn" onclick="app.closeFastSell()">Отмена</button>
+        <button class="btn btn-purple" onclick="app.confirmFastSell()">Выдать чек и продать</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ==================== ADD / EDIT MEDICINE FORM ==================== */
+function renderFormSheet() {
+  const editing = !!state.ui.editingId;
+  const med = editing ? state.meds.find(m => m.id === state.ui.editingId) : null;
+  const f = state.ui.form;
+  const admin = isAdmin();
+
+  return `
+  <div class="overlay" onclick="app.closeForm()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h2>${editing ? "Карточка товара" : "Добавить лекарство с фото"}</h2>
+
+      <label class="field-label">Фотография упаковки</label>
+      <div class="photo-dropzone" onclick="app.pickPhoto()">
+        ${f.photo 
+          ? `
+            <img src="${f.photo}" class="photo-preview-large">
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();app.pickPhoto()">Заменить фото</button>
+              <button type="button" class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();app.removePhoto()">Удалить</button>
+            </div>
+          ` : `
+            <div style="font-size:36px;margin-bottom:6px;">📸</div>
+            <div style="font-size:14px;font-weight:700;color:var(--pine);">Сделать снимок или загрузить фото</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;">Нажмите сюда для выбора фотографии лекарства</div>
+          `
+        }
+      </div>
+
+      <label class="field-label">Название лекарства (как на упаковке)</label>
+      <input class="field-input" placeholder="Например: Сперовелл Форте тб №30" value="${escapeHtml(f.name)}" oninput="app.setForm('name', this.value)">
+
+      <div class="row">
+        <div>
+          <label class="field-label">Производитель</label>
+          <input class="field-input" placeholder="Например: Стар фарма" value="${escapeHtml(f.manufacturer)}" oninput="app.setForm('manufacturer', this.value)">
+        </div>
+        <div>
+          <label class="field-label">Страна</label>
+          <input class="field-input" placeholder="Например: Индия" value="${escapeHtml(f.country)}" oninput="app.setForm('country', this.value)">
+        </div>
+      </div>
+
+      <label class="field-label">Категория</label>
+      ${!state.ui.newCategoryMode ? `
+        <select class="field-input" onchange="app.onCategoryChange(this.value)">
+          ${allCategories().map(c => `<option value="${escapeHtml(c)}" ${f.category===c?"selected":""}>${escapeHtml(c)}</option>`).join("")}
+          <option value="__new__">+ Создать новую категорию...</option>
+        </select>
+      ` : `
+        <div class="row" style="margin-bottom:12px;">
+          <input class="field-input" style="margin-bottom:0" placeholder="Название новой категории" value="${escapeHtml(state.ui.newCategoryName)}" oninput="app.setNewCategoryName(this.value)">
+          <button class="btn" style="flex:0 0 auto;padding:0 14px;" onclick="app.cancelNewCategory()">Отмена</button>
+        </div>
+      `}
+
+      <div class="row">
+        <div>
+          <label class="field-label">Цена (${getCurrency()})</label>
+          <input class="field-input" inputmode="decimal" placeholder="116" value="${escapeHtml(f.price)}" oninput="app.setForm('price', this.value)">
+        </div>
+        <div>
+          <label class="field-label">Количество на складе</label>
+          <input class="field-input" inputmode="numeric" placeholder="20" value="${escapeHtml(f.qty)}" oninput="app.setForm('qty', this.value)">
+        </div>
+        <div style="max-width:90px">
+          <label class="field-label">Ед.</label>
+          <select class="field-input" onchange="app.setForm('unit', this.value)">
+            ${["уп.","шт.","фл.","капс.","амп."].map(u => `<option value="${u}" ${f.unit===u?"selected":""}>${u}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+
+      ${editing && med && med.addedBy ? `
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;padding:6px 10px;background:#F8FAFC;border-radius:6px;">
+          Добавлено сотрудником: <strong>${escapeHtml(med.addedBy)}</strong> (${fmtDate(med.addedAt)})
+        </div>
+      ` : ""}
+
+      ${state.ui.formError ? `<p class="error-text">${escapeHtml(state.ui.formError)}</p>` : ""}
+
+      <div class="btn-row">
+        ${editing && admin ? `<button class="btn btn-danger" onclick="app.deleteMedicine('${med.id}')">Удалить</button>` : ""}
+        <button class="btn" onclick="app.closeForm()">Отмена</button>
+        <button class="btn btn-primary" onclick="app.submitForm()">Сохранить товар</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ==================== TELEGRAM DEDICATED MODAL ==================== */
+function renderTelegramModal() {
+  const s = state.settings;
+  const isConnected = !!(s.telegramBotToken && s.telegramChatId);
+
+  return `
+  <div class="overlay" onclick="app.closeTelegramModal()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:28px;">✈️</span>
+        <h2 style="margin:0;">Telegram на телефоне Администратора</h2>
+      </div>
+
+      <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12.5px;font-weight:700;margin-bottom:14px;background:${isConnected ? '#DCFCE7;color:#15803D;' : '#F1F5F9;color:#64748B;'}">
+        <span>${isConnected ? "🟢 Подключен к вашему телефону" : "⚪ Ещё не подключен"}</span>
+      </div>
+
+      <div style="background:#F0F7FF;border:1px solid #BAE6FD;border-radius:12px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:13.5px;font-weight:700;color:#0369A1;margin-bottom:6px;">Как это работает:</div>
+        <div style="font-size:12.5px;color:#334155;line-height:1.45;">
+          • Когда продавец добавит лекарство — вам на телефон мгновенно придут кнопки <b>[Одобрить]</b> / <b>[Отклонить]</b>.<br>
+          • При каждой продаже на телефон приходит чек с суммой и именем продавца.<br>
+          • Напишите боту <b>/stats</b> — и он пришлет выручку за сегодня!
+        </div>
+      </div>
+
+      <label class="field-label">1. Токен бота (Bot Token из @BotFather):</label>
+      <input class="field-input" placeholder="Например: 7123456789:AAH..." value="${escapeHtml(s.telegramBotToken)}" oninput="app.setTelegramSetting('telegramBotToken', this.value)">
+
+      <label class="field-label">2. Ваш личный Chat ID (из бота @userinfobot):</label>
+      <input class="field-input" placeholder="Например: 123456789" value="${escapeHtml(s.telegramChatId)}" oninput="app.setTelegramSetting('telegramChatId', this.value)">
+
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn btn-telegram" style="padding:12px;" onclick="app.testTelegram()">
+          ${state.ui.tgTesting ? "Отправка..." : "✈️ Отправить тестовое сообщение на телефон"}
+        </button>
+      </div>
+
+      <div style="border-top:1px solid var(--line);margin-top:16px;padding-top:14px;">
+        <button class="btn" style="width:100%;" onclick="app.closeTelegramModal()">Готово / Закрыть</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ==================== ADMIN PANEL ==================== */
+function renderAdmin() {
+  const tab = state.ui.adminTab;
+  const p = state.ui.adminPeriod;
+  const sellerF = state.ui.adminSellerFilter;
+  const periods = [["today","Сегодня"],["week","7 дней"],["month","30 дней"],["all","Всё время"]];
+  const newMeds = state.meds.filter(m => m.priceUnconfirmed);
+  const priceReqs = state.priceRequests || [];
+  const pendingCount = newMeds.length + priceReqs.length;
+
+  return `
+  <header>
+    <div class="top-row">
+      <div>
+        <h1>Панель администратора</h1>
+        <p class="sub">Пароли сотрудников, отчеты и Telegram</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="app.exitAdmin()" title="Вернуться к складу">✕</button>
+        <button class="icon-btn" onclick="app.logout()" title="Выйти">🚪</button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="admin-tabs-wrap">
+      <button class="admin-tab-scroll" onclick="app.scrollAdminTabs(-1)" aria-label="Влево">‹</button>
+      <div class="admin-tabs" id="adminTabs">
+      <button class="admin-tab ${tab==='overview'?'active':''}" onclick="app.setAdminTab('overview')">📊 Обзор</button>
+      <button class="admin-tab ${tab==='sellers'?'active':''}" onclick="app.setAdminTab('sellers')">👥 Продавцы и пароли (${state.sellers.length})</button>
+      <button class="admin-tab ${tab==='sales_by_seller'?'active':''}" onclick="app.setAdminTab('sales_by_seller')">🛒 Продажи по сотрудникам</button>
+      <button class="admin-tab ${tab==='supplies'?'active':''}" onclick="app.setAdminTab('supplies')">📦 Поступления</button>
+      <button class="admin-tab ${tab==='telegram'?'active':''}" onclick="app.setAdminTab('telegram')" style="color:#0088CC;border-color:#BAE6FD;">✈️ Telegram на телефоне</button>
+      ${pendingCount > 0 ? `<button class="admin-tab ${tab==='approval'?'active':''}" onclick="app.setAdminTab('approval')" style="background:#FFF3E0;color:#E65100;">⏳ Одобрение (${pendingCount})</button>` : ""}
+      </div>
+      <button class="admin-tab-scroll" onclick="app.scrollAdminTabs(1)" aria-label="Вправо">›</button>
+    </div>
+
+    ${tab === 'overview' ? renderAdminOverview(p, periods) : ""}
+    ${tab === 'sellers' ? renderAdminSellers() : ""}
+    ${tab === 'sales_by_seller' ? renderAdminSalesBySeller(p, periods, sellerF) : ""}
+    ${tab === 'supplies' ? renderAdminSupplies() : ""}
+    ${tab === 'telegram' ? renderAdminTelegramTab() : ""}
+    ${tab === 'approval' ? renderAdminApprovals(newMeds, priceReqs) : ""}
+  </main>`;
+}
+
+function renderAdminTelegramTab() {
+  const s = state.settings;
+  const isConnected = !!(s.telegramBotToken && s.telegramChatId);
+
+  return `
+    <div class="table-card" style="border:1.5px solid #0088CC;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:26px;">✈️</span>
+        <h2 style="font-size:18px;margin:0;">Подключение Telegram на телефон Администратора</h2>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">
+        Статус: <strong>${isConnected ? "<span style='color:#15803D;'>🟢 Подключен</span>" : "<span style='color:#64748B;'>⚪ Не настроен</span>"}</strong>
+      </p>
+
+      <label class="field-label">1. Токен бота (из @BotFather):</label>
+      <input class="field-input" placeholder="7123456789:AAH..." value="${escapeHtml(s.telegramBotToken)}" oninput="app.setTelegramSetting('telegramBotToken', this.value)">
+
+      <label class="field-label">2. Ваш личный Chat ID (из @userinfobot):</label>
+      <input class="field-input" placeholder="123456789" value="${escapeHtml(s.telegramChatId)}" oninput="app.setTelegramSetting('telegramChatId', this.value)">
+
+      <button class="btn btn-telegram" style="width:100%;margin-top:6px;" onclick="app.testTelegram()">
+        ${state.ui.tgTesting ? "Отправляем..." : "✈️ Отправить тест на телефон"}
+      </button>
+    </div>
+
+    <div class="table-card" style="border:1.5px solid #F59E0B;background:#FFFBEB;margin-top:10px;">
+      <p style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:6px;">⚠️ Важно: используйте один компьютер/браузер</p>
+      <p style="font-size:12.5px;color:#78350F;line-height:1.5;margin:0;">
+        Все товары, продажи и заявки на цены хранятся в браузере того устройства, где их создали — они не появляются автоматически на других устройствах.<br><br>
+        Чтобы одобрения цен точно приходили и были видны в разделе «Одобрение»:<br>
+        • Работайте всегда с <b>одного и того же компьютера/ноутбука</b> — это основное рабочее место.<br>
+        • Держите вкладку с приложением на этом компьютере <b>открытой</b> — так кнопки «Одобрить/Отклонить» из Telegram применятся правильно.<br>
+        • Телефон используйте только для получения сообщений в Telegram и нажатия кнопок — не открывайте это же приложение отдельно на телефоне, иначе данные разъедутся.
+      </p>
+    </div>
+  `;
+}
+
+function renderAdminOverview(p, periods) {
+  const top = topSelling(p);
+  const sales = salesInPeriod(p).slice().sort((a,b) => b.timestamp - a.timestamp).slice(0, 15);
+
+  return `
+    <div class="period-row">
+      ${periods.map(([key,label]) => `<button class="period-btn ${p===key?'active':''}" onclick="app.setAdminPeriod('${key}')">${label}</button>`).join("")}
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><p class="stat-label">Выручка</p><p class="stat-value">${fmtPrice(totalRevenue(p))}</p></div>
+      <div class="stat-card"><p class="stat-label">Продано</p><p class="stat-value">${totalUnitsSold(p)} шт.</p></div>
+      <div class="stat-card"><p class="stat-label">Склад всего</p><p class="stat-value">${fmtPrice(inventoryValue())}</p></div>
+      <div class="stat-card"><p class="stat-label">Мало на складе</p><p class="stat-value" style="color:#DC2626;">${state.meds.filter(m=>m.qty<=state.settings.threshold).length}</p></div>
+    </div>
+
+    ${top.length ? `
+      <div class="group-title">Лидеры продаж</div>
+      <div class="table-card">
+        ${top.map(([name,qty]) => `<div class="sale-row"><span><strong>${escapeHtml(name)}</strong></span><span>${qty} шт.</span></div>`).join("")}
+      </div>
+    ` : ""}
+
+    <div class="group-title" style="margin-top:16px;">Последние продажи</div>
+    <div class="table-card">
+      ${sales.length === 0 ? `<div class="empty-state" style="margin:1rem 0;">За этот период продаж не было.</div>` :
+        sales.map(s => `
+          <div class="sale-row">
+            <div>
+              <div><strong>${escapeHtml(s.name)}</strong></div>
+              <div class="meta">${fmtDate(s.timestamp)} · Продавец: <strong>${escapeHtml(s.sellerName || "—")}</strong></div>
+            </div>
+            <div style="text-align:right;">
+              <div><strong>${fmtPrice(s.total)}</strong></div>
+              <div class="meta">${s.qty} шт.</div>
+            </div>
+          </div>
+        `).join("")}
+    </div>
+  `;
+}
+
+function renderAdminSellers() {
+  const currentOnlineSellerId = state.ui.currentSeller ? state.ui.currentSeller.id : null;
+  const lastSessionMap = new Map();
+  state.sessions.forEach(s => {
+    if (!lastSessionMap.has(s.sellerId) || s.timestamp > lastSessionMap.get(s.sellerId)) {
+      lastSessionMap.set(s.sellerId, s.timestamp);
+    }
+  });
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="group-title" style="margin:0;">Сотрудники и их пароли</div>
+      <button class="btn btn-primary" style="flex:0 0 auto;padding:8px 14px;font-size:13px;" onclick="app.openAddSellerModal()">+ Добавить продавца</button>
+    </div>
+
+    <div class="info-box">
+      🔒 <strong>Безопасность:</strong> Администратор всегда видит пароли всех продавцов и может сменить их в любой момент.
+    </div>
+
+    ${state.sellers.map(s => {
+      const isCurrent = s.id === currentOnlineSellerId;
+      const lastLogin = lastSessionMap.get(s.id);
+      const sellerSales = state.sales.filter(x => x.sellerId === s.id);
+      const sum = sellerSales.reduce((acc,x) => acc + x.total, 0);
+
+      return `
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <span style="font-size:16px;font-weight:700;">${escapeHtml(s.name)}</span>
+            ${isCurrent ? `<span style="font-size:11.5px;color:#27AE60;margin-left:6px;font-weight:700;"><span class="online-indicator"></span>сейчас на смене</span>` : ""}
+          </div>
+          <div>
+            <span class="pw-badge">Код: ${escapeHtml(s.pin)}</span>
+          </div>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;">
+          ${lastLogin ? "Последний вход: " + fmtDate(lastLogin) : "Ещё не входил"} · Продано на: <strong>${fmtPrice(sum)}</strong> (${sellerSales.length} продаж)
+        </div>
+        <div class="btn-row" style="margin-top:0;">
+          <button class="btn" style="padding:7px 12px;font-size:13px;" onclick="app.openEditSellerModal('${s.id}')">✏️ Сменить пароль / имя</button>
+          ${state.sellers.length > 1 ? `<button class="btn btn-danger" style="flex:0 0 auto;padding:7px 12px;font-size:13px;" onclick="app.deleteSeller('${s.id}')">Удалить</button>` : ""}
+        </div>
+      </div>`;
+    }).join("")}
+
+    <div class="group-title" style="margin-top:20px;">Журнал входов</div>
+    <div class="table-card">
+      ${state.sessions.length === 0 ? `<div class="empty-state" style="margin:1rem 0;">Записей о входах пока нет.</div>` :
+        state.sessions.slice(-10).reverse().map(sess => `
+          <div class="sale-row">
+            <div>
+              <strong>${escapeHtml(sess.sellerName)}</strong>
+              <div class="meta">Вошел в систему</div>
+            </div>
+            <div class="meta">${fmtDate(sess.timestamp)}</div>
+          </div>
+        `).join("")}
+    </div>
+  `;
+}
+
+function renderAdminSalesBySeller(p, periods, sellerF) {
+  const sales = salesInPeriod(p, sellerF).slice().sort((a,b) => b.timestamp - a.timestamp);
+  const totalRev = totalRevenue(p, sellerF);
+  const totalUnits = totalUnitsSold(p, sellerF);
+
+  const medSummary = new Map();
+  sales.forEach(s => {
+    if (!medSummary.has(s.name)) medSummary.set(s.name, { qty: 0, sum: 0 });
+    const cur = medSummary.get(s.name);
+    cur.qty += s.qty;
+    cur.sum += s.total;
+  });
+  const sortedMeds = Array.from(medSummary.entries()).sort((a,b) => b[1].sum - a[1].sum);
+
+  return `
+    <div class="period-row">
+      ${periods.map(([key,label]) => `<button class="period-btn ${p===key?'active':''}" onclick="app.setAdminPeriod('${key}')">${label}</button>`).join("")}
+    </div>
+
+    <label class="field-label">Выберите продавца для анализа:</label>
+    <div class="chips" style="margin-top:0;margin-bottom:14px;">
+      <button class="chip ${sellerF==='all'?'active':''}" style="background:${sellerF==='all'?'var(--pine)':'#fff'};color:${sellerF==='all'?'#fff':'var(--ink)'};border:1px solid var(--line);" onclick="app.setAdminSellerFilter('all')">Все продавцы</button>
+      ${state.sellers.map(s => `
+        <button class="chip ${sellerF===s.id?'active':''}" style="background:${sellerF===s.id?'var(--pine)':'#fff'};color:${sellerF===s.id?'#fff':'var(--ink)'};border:1px solid var(--line);" onclick="app.setAdminSellerFilter('${s.id}')">${escapeHtml(s.name)}</button>
+      `).join("")}
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><p class="stat-label">Выручка продавца</p><p class="stat-value">${fmtPrice(totalRev)}</p></div>
+      <div class="stat-card"><p class="stat-label">Продано товаров</p><p class="stat-value">${totalUnits} шт.</p></div>
+    </div>
+
+    <div class="group-title">Какие лекарства продал сотрудник</div>
+    <div class="table-card">
+      ${sortedMeds.length === 0 ? `<div class="empty-state" style="margin:1rem 0;">Нет продаж за выбранный период.</div>` :
+        sortedMeds.map(([name, data]) => `
+          <div class="sale-row">
+            <div><strong>${escapeHtml(name)}</strong></div>
+            <div style="text-align:right;">
+              <div><strong>${fmtPrice(data.sum)}</strong></div>
+              <div class="meta">${data.qty} шт.</div>
+            </div>
+          </div>
+        `).join("")}
+    </div>
+
+    <div class="group-title" style="margin-top:16px;">Список проданных чеков</div>
+    <div class="table-card">
+      ${sales.length === 0 ? `<div class="empty-state" style="margin:1rem 0;">Чеков пока нет.</div>` :
+        sales.slice(0, 30).map(s => `
+          <div class="sale-row">
+            <div>
+              <div><strong>${escapeHtml(s.name)}</strong></div>
+              <div class="meta">${fmtDate(s.timestamp)} · Продавец: <strong>${escapeHtml(s.sellerName || "—")}</strong></div>
+            </div>
+            <div style="text-align:right;">
+              <div><strong>${fmtPrice(s.total)}</strong></div>
+              <div class="meta">${s.qty} шт.</div>
+            </div>
+          </div>
+        `).join("")}
+    </div>
+  `;
+}
+
+function renderAdminSupplies() {
+  const supplies = (state.logs || []).filter(l => l.type === 'add_med' || l.type === 'restock').slice().reverse();
+
+  return `
+    <div class="group-title">Кто добавил или пополнил лекарства</div>
+    <div class="info-box">
+      Журнал всех добавлений лекарств с указанием имени продавца, даты и количества.
+    </div>
+
+    <div class="table-card">
+      ${supplies.length === 0 ? `<div class="empty-state" style="margin:1rem 0;">Записей о добавлениях пока нет.</div>` :
+        supplies.map(sup => `
+          <div class="sale-row">
+            <div>
+              <div><strong>${escapeHtml(sup.medicineName)}</strong></div>
+              <div class="meta">
+                ${sup.type==='add_med' ? "✨ Новое лекарство" : "📥 Пополнение остатка"} · 
+                Сотрудник: <strong style="color:var(--pine);">${escapeHtml(sup.by || "—")}</strong>
+              </div>
+              <div class="meta">${fmtDate(sup.timestamp)}</div>
+            </div>
+            <div style="text-align:right;">
+              <div><strong>+${sup.qty} ${escapeHtml(sup.unit || "уп.")}</strong></div>
+              <div class="meta">${fmtPrice(sup.price)}</div>
+            </div>
+          </div>
+        `).join("")}
+    </div>
+  `;
+}
+
+function renderAdminApprovals(newMeds, priceReqs) {
+  if (newMeds.length === 0 && priceReqs.length === 0) {
+    return `<div class="table-card"><p class="sub" style="margin:0;">Нет заявок, ожидающих подтверждения.</p></div>`;
+  }
+  return `
+    ${newMeds.length ? `<div class="group-title">Новые товары от продавцов</div>` : ""}
+    ${newMeds.map(m => `
+      <div class="table-card" style="margin-bottom:10px;">
+        <p class="stat-label">Новое лекарство от продавца ${escapeHtml(m.addedBy || "")}</p>
+        <p style="font-size:15px;font-weight:700;margin:3px 0 8px;">${escapeHtml(m.name)} (${m.qty} ${escapeHtml(m.unit)})</p>
+        <div class="row">
+          <input class="field-input" style="margin-bottom:0" type="number" step="0.01" min="0" value="${m.price}" id="np_${m.id}">
+          <button class="btn btn-primary" style="flex:0 0 auto;padding:0 14px;" onclick="app.confirmNewMedicine('${m.id}')">Одобрить</button>
+          <button class="btn" style="flex:0 0 auto;padding:0 14px;" onclick="app.rejectNewMedicine('${m.id}')">Отклонить</button>
+        </div>
+      </div>
+    `).join("")}
+    ${priceReqs.length ? `<div class="group-title">Изменение цены</div>` : ""}
+    ${priceReqs.map(r => `
+      <div class="table-card" style="margin-bottom:10px;">
+        <p class="stat-label">Запрос от ${escapeHtml(r.requestedBy || "")}</p>
+        <p style="font-size:15px;font-weight:700;margin:3px 0 2px;">${escapeHtml(r.name)}</p>
+        <p class="sub" style="margin:0 0 8px;">Было: <strong>${fmtPrice(r.oldPrice)}</strong></p>
+        <div class="row">
+          <input class="field-input" style="margin-bottom:0" type="number" step="0.01" min="0" value="${r.newPrice}" id="pr_${r.id}">
+          <button class="btn btn-primary" style="flex:0 0 auto;padding:0 14px;" onclick="app.confirmPriceRequest('${r.id}')">Одобрить</button>
+          <button class="btn" style="flex:0 0 auto;padding:0 14px;" onclick="app.rejectPriceRequest('${r.id}')">Отклонить</button>
+        </div>
+      </div>
+    `).join("")}
+  `;
+}
+
+function renderSettingsSheet() {
+  const s = state.settings;
+  const admin = isAdmin();
+  return `
+  <div class="overlay" onclick="app.closeSettings()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h2>Настройки</h2>
+
+      <label class="field-label">Валюта цен</label>
+      <select class="field-input" onchange="app.setCurrency(this.value)">
+        <option value="с." ${s.currency==="с."?"selected":""}>с. (Сомони - Таджикистан)</option>
+        <option value="₽" ${s.currency==="₽"?"selected":""}>₽ (Рубли)</option>
+        <option value="$" ${s.currency==="$"?"selected":""}>$ (Доллары)</option>
+      </select>
+
+      <label class="field-label">Порог низкого остатка</label>
+      <input class="field-input" type="number" min="0" value="${s.threshold}" oninput="app.setThreshold(this.value)">
+
+      ${admin ? `
+        <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:14px;">
+          <label class="field-label">Пароль администратора</label>
+          <input class="field-input" type="password" placeholder="Текущий пароль" value="${escapeHtml(state.ui.pwCurrent)}" oninput="app.setPwCurrent(this.value)">
+          <input class="field-input" type="password" placeholder="Новый пароль" value="${escapeHtml(state.ui.pwNew)}" oninput="app.setPwNew(this.value)">
+          ${state.ui.pwError ? `<p class="error-text">${escapeHtml(state.ui.pwError)}</p>` : ""}
+          <button class="btn btn-primary" style="width:100%;" onclick="app.changeAdminPassword()">Сохранить новый пароль</button>
+        </div>
+        <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:14px;">
+          <label class="field-label">Мастер-пароль (для сброса пароля админа)</label>
+          <p style="font-size:12px;color:var(--muted);margin:-4px 0 8px;">Используется на экране входа администратора, если обычный пароль забыт. Храните его в надёжном месте.</p>
+          <input class="field-input" type="password" placeholder="Текущий мастер-пароль" value="${escapeHtml(state.ui.masterPwCurrent)}" oninput="app.setMasterPwCurrent(this.value)">
+          <input class="field-input" type="password" placeholder="Новый мастер-пароль" value="${escapeHtml(state.ui.masterPwNew)}" oninput="app.setMasterPwNew(this.value)">
+          ${state.ui.masterPwError ? `<p class="error-text">${escapeHtml(state.ui.masterPwError)}</p>` : ""}
+          <button class="btn btn-primary" style="width:100%;" onclick="app.changeMasterPassword()">Сохранить мастер-пароль</button>
+        </div>
+      ` : ""}
+
+      <div style="border-top:1px solid var(--line);padding-top:14px;margin-bottom:14px;">
+        <label class="field-label">Резервная копия базы данных</label>
+        <div class="btn-row">
+          <button class="btn" onclick="app.exportData()">💾 Скачать базу</button>
+          <button class="btn" onclick="app.pickRestoreFile()">📥 Восстановить базу</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="app.closeSettings()">Готово</button>
+    </div>
+  </div>`;
+}
+
+function renderModals() {
+  let html = "";
+  if (state.ui.scanning || state.ui.scanError || state.ui.toastSuccess) {
+    if (state.ui.scanning) html += `<div class="toast">⟳ Распознаём лекарство по фото...</div>`;
+    else if (state.ui.scanError) html += `<div class="toast error">${escapeHtml(state.ui.scanError)} <button style="background:none;border:none;color:#991B1B;margin-left:auto;font-weight:700;" onclick="app.clearToast()">✕</button></div>`;
+    else if (state.ui.toastSuccess) html += `<div class="toast success">${escapeHtml(state.ui.toastSuccess)}</div>`;
+  }
+
+  if (state.ui.showSellerLogin) html += renderSellerLoginModal();
+  if (state.ui.showAdminLogin) html += renderAdminLoginModal();
+  if (state.ui.showAdminReset) html += renderAdminResetModal();
+  if (state.ui.showSellerForm) html += renderSellerFormModal();
+  if (state.ui.showSellSheet) html += renderFastSellModal();
+  if (state.ui.showForm) html += renderFormSheet();
+  if (state.ui.showTelegramModal) html += renderTelegramModal();
+  if (state.ui.showSettings) html += renderSettingsSheet();
+
+  return html;
+}
+
+function renderSellerLoginModal() {
+  return `
+  <div class="overlay" onclick="app.closeSellerLogin()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h2>Вход продавца</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Выберите своё имя и введите код доступа:</p>
+
+      <label class="field-label">Выберите продавца</label>
+      <div style="margin-bottom:14px;">
+        ${state.sellers.map(s => `
+          <button type="button" class="seller-select-btn ${state.ui.selectedSellerId===s.id?'active':''}" onclick="app.selectSellerLogin('${s.id}')">
+            <span>👤 ${escapeHtml(s.name)}</span>
+            ${state.ui.selectedSellerId===s.id ? `<span style="font-size:18px;">✓</span>` : ""}
+          </button>
+        `).join("")}
+      </div>
+
+      <label class="field-label">Персональный PIN-код</label>
+      <input class="field-input" type="password" placeholder="Введите код" value="${escapeHtml(state.ui.sellerPinInput)}" oninput="app.setSellerPinInput(this.value)" onkeydown="if(event.key==='Enter') app.submitSellerLogin()">
+
+      ${state.ui.sellerLoginError ? `<p class="error-text">${escapeHtml(state.ui.sellerLoginError)}</p>` : ""}
+
+      <div class="btn-row">
+        <button class="btn" onclick="app.closeSellerLogin()">Отмена</button>
+        <button class="btn btn-primary" onclick="app.submitSellerLogin()">Войти в систему</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAdminLoginModal() {
+  return `
+  <div class="overlay" onclick="app.closeAdminLogin()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h2>Вход администратора</h2>
+      <label class="field-label">Пароль администратора</label>
+      <input class="field-input" type="password" placeholder="Введите пароль" value="${escapeHtml(state.ui.adminPasswordInput)}" oninput="app.setAdminPasswordInput(this.value)" onkeydown="if(event.key==='Enter') app.submitAdminLogin()">
+      ${state.ui.adminLoginError ? `<p class="error-text">${escapeHtml(state.ui.adminLoginError)}</p>` : ""}
+      <p style="text-align:right;margin-top:6px;">
+        <a href="javascript:void(0)" onclick="app.openAdminReset()" style="font-size:13px;color:var(--purple-btn);font-weight:600;">Забыли пароль?</a>
+      </p>
+      <div class="btn-row">
+        <button class="btn" onclick="app.closeAdminLogin()">Отмена</button>
+        <button class="btn btn-primary" onclick="app.submitAdminLogin()">Войти</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAdminResetModal() {
+  return `
+  <div class="overlay" onclick="app.closeAdminReset()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h2>Сброс пароля администратора</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Введите мастер-пароль и задайте новый пароль администратора.</p>
+
+      <label class="field-label">Мастер-пароль</label>
+      <input class="field-input" type="password" placeholder="Мастер-пароль" value="${escapeHtml(state.ui.resetMasterInput)}" oninput="app.setResetMasterInput(this.value)">
+
+      <label class="field-label">Новый пароль администратора</label>
+      <input class="field-input" type="password" placeholder="Новый пароль" value="${escapeHtml(state.ui.resetNewPassword)}" oninput="app.setResetNewPassword(this.value)" onkeydown="if(event.key==='Enter') app.submitAdminReset()">
+
+      ${state.ui.resetError ? `<p class="error-text">${escapeHtml(state.ui.resetError)}</p>` : ""}
+
+      <div class="btn-row">
+        <button class="btn" onclick="app.closeAdminReset()">Отмена</button>
+        <button class="btn btn-primary" onclick="app.submitAdminReset()">Сбросить пароль</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderSellerFormModal() {
+  const isEditing = !!state.ui.editingSellerId;
+  return `
+  <div class="overlay" onclick="app.closeSellerForm()">
+    <div class="sheet" onclick="event.stopPropagation()">
+      <h2>${isEditing ? "Редактировать продавца" : "Новый продавец"}</h2>
+
+      <label class="field-label">Имя продавца</label>
+      <input class="field-input" placeholder="Например: Мария, Азиз" value="${escapeHtml(state.ui.sellerFormName)}" oninput="app.setSellerFormName(this.value)">
+
+      <label class="field-label">Персональный PIN-код / пароль</label>
+      <input class="field-input" placeholder="Например: 1234" value="${escapeHtml(state.ui.sellerFormPin)}" oninput="app.setSellerFormPin(this.value)">
+
+      ${state.ui.sellerFormError ? `<p class="error-text">${escapeHtml(state.ui.sellerFormError)}</p>` : ""}
+
+      <div class="btn-row">
+        <button class="btn" onclick="app.closeSellerForm()">Отмена</button>
+        <button class="btn btn-primary" onclick="app.saveSellerForm()">Сохранить</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ==================== APP CONTROLLER ==================== */
+const app = {
+  setQuery(v) { state.ui.query = v; render(); },
+  setCategory(c) { state.ui.activeCategory = c; render(); },
+  setCurrency(v) { state.settings.currency = v; persist(); render(); },
+  setTelegramSetting(k, v) { state.settings[k] = v; persist(); },
+
+  openTelegramModal() { state.ui.showTelegramModal = true; render(); },
+  closeTelegramModal() { state.ui.showTelegramModal = false; render(); },
+
+  async testTelegram() {
+    state.ui.tgTesting = true;
+    render();
+    const res = await tgSendMessage(
+      "✅ <b>Тестовое сообщение от вашей Аптеки!</b>\n\n" +
+      "Связь компьютера аптеки с вашим телефоном успешно установлена! 🎉\n" +
+      "Теперь сюда будут приходить уведомления о продажах и кнопки для одобрения цен."
+    );
+    state.ui.tgTesting = false;
+    if (res && res.ok) {
+      state.ui.toastSuccess = "Сообщение успешно отправлено в ваш Telegram!";
+    } else {
+      const reason = (res && res.description) ? res.description : "неизвестная ошибка";
+      if (reason.startsWith("network_error")) {
+        state.ui.scanError = "Не удалось связаться с Telegram (нет сети или блокировка запроса). Откройте приложение через https:// (не просто двойным кликом по файлу) и проверьте интернет.";
+      } else {
+        state.ui.scanError = "Telegram: " + reason;
+      }
+    }
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; state.ui.scanError = ""; render(); }, 6000);
+  },
+
+  // Role Gate & Login
+  openSellerLogin() {
+    state.ui.showSellerLogin = true;
+    state.ui.sellerPinInput = "";
+    state.ui.sellerLoginError = "";
+    if (state.sellers.length > 0 && !state.ui.selectedSellerId) {
+      state.ui.selectedSellerId = state.sellers[0].id;
+    }
+    render();
+  },
+  closeSellerLogin() { state.ui.showSellerLogin = false; render(); },
+  selectSellerLogin(id) { state.ui.selectedSellerId = id; render(); },
+  setSellerPinInput(v) { state.ui.sellerPinInput = v; },
+  submitSellerLogin() {
+    const s = state.sellers.find(x => x.id === state.ui.selectedSellerId);
+    if (!s) {
+      state.ui.sellerLoginError = "Выберите продавца из списка";
+      render(); return;
+    }
+    if ((state.ui.sellerPinInput || "").trim() !== s.pin) {
+      state.ui.sellerLoginError = "Неверный код доступа для продавца " + s.name;
+      render(); return;
+    }
+    state.ui.currentSeller = { id: s.id, name: s.name };
+    state.ui.adminLoggedIn = false;
+    state.ui.roleChosen = true;
+    state.ui.showSellerLogin = false;
+    state.ui.view = "list";
+
+    state.sessions.push({
+      id: uid(),
+      sellerId: s.id,
+      sellerName: s.name,
+      timestamp: Date.now()
+    });
+    persist();
+
+    // Telegram notification about seller login
+    tgSendMessage(`🚪 <b>Вход на смену:</b> продавец <b>«${escapeHtml(s.name)}»</b> вошел в кассу.`);
+
+    state.ui.toastSuccess = "Здравствуйте, " + s.name + "!";
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3000);
+  },
+
+  chooseRoleAdmin() {
+    state.ui.showAdminLogin = true;
+    state.ui.adminPasswordInput = "";
+    state.ui.adminLoginError = "";
+    render();
+  },
+  closeAdminLogin() { state.ui.showAdminLogin = false; render(); },
+  setAdminPasswordInput(v) { state.ui.adminPasswordInput = v; },
+  submitAdminLogin() {
+    const pw = (state.ui.adminPasswordInput || "").trim();
+    const correctPw = state.settings.adminPassword || "admin";
+    if (pw === correctPw) {
+      state.ui.adminLoggedIn = true;
+      state.ui.currentSeller = null;
+      state.ui.roleChosen = true;
+      state.ui.showAdminLogin = false;
+      state.ui.view = "list";
+      state.ui.toastSuccess = "Вход администратора выполнен";
+      render();
+      setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3000);
+    } else {
+      state.ui.adminLoginError = "Неверный пароль администратора";
+      render();
+    }
+  },
+
+  // Admin password reset via master password
+  openAdminReset() {
+    state.ui.showAdminLogin = false;
+    state.ui.showAdminReset = true;
+    state.ui.resetMasterInput = "";
+    state.ui.resetNewPassword = "";
+    state.ui.resetError = "";
+    render();
+  },
+  closeAdminReset() {
+    state.ui.showAdminReset = false;
+    state.ui.showAdminLogin = true;
+    render();
+  },
+  setResetMasterInput(v) { state.ui.resetMasterInput = v; },
+  setResetNewPassword(v) { state.ui.resetNewPassword = v; },
+  submitAdminReset() {
+    const master = (state.ui.resetMasterInput || "").trim();
+    const newPw = (state.ui.resetNewPassword || "").trim();
+    const correctMaster = state.settings.masterPassword || "master2024";
+
+    if (master !== correctMaster) {
+      state.ui.resetError = "Неверный мастер-пароль";
+      render();
+      return;
+    }
+    if (!newPw) {
+      state.ui.resetError = "Введите новый пароль администратора";
+      render();
+      return;
+    }
+
+    state.settings.adminPassword = newPw;
+    persist();
+
+    if (state.settings.telegramNotifySales || state.settings.telegramNotifyNewMeds) {
+      tgSendMessage(
+        `🔐 <b>Пароль администратора сброшен!</b>\n` +
+        `Пароль был изменён через мастер-пароль ${fmtDate(Date.now())}.\n` +
+        `<i>Если это были не вы — срочно смените мастер-пароль и пароль администратора в настройках.</i>`
+      );
+    }
+
+    state.ui.showAdminReset = false;
+    state.ui.showAdminLogin = true;
+    state.ui.adminPasswordInput = "";
+    state.ui.adminLoginError = "";
+    state.ui.toastSuccess = "Пароль администратора сброшен! Войдите с новым паролем";
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 4000);
+  },
+
+  logout() {
+    state.ui.roleChosen = false;
+    state.ui.currentSeller = null;
+    state.ui.adminLoggedIn = false;
+    state.ui.view = "list";
+    render();
+  },
+
+  // Admin Navigation
+  openAdminPanel() { if (!isAdmin()) return; state.ui.view = "admin"; render(); },
+  exitAdmin() { state.ui.view = "list"; render(); },
+  setAdminTab(t) { state.ui.adminTab = t; render(); },
+  scrollAdminTabs(direction) {
+    const tabs = document.getElementById("adminTabs");
+    if (tabs) tabs.scrollBy({ left: direction * 260, behavior: "smooth" });
+  },
+  setAdminPeriod(p) { state.ui.adminPeriod = p; render(); },
+  setAdminSellerFilter(f) { state.ui.adminSellerFilter = f; render(); },
+
+  // Seller CRUD
+  openAddSellerModal() {
+    state.ui.editingSellerId = null;
+    state.ui.sellerFormName = "";
+    state.ui.sellerFormPin = "";
+    state.ui.sellerFormError = "";
+    state.ui.showSellerForm = true;
+    render();
+  },
+  openEditSellerModal(id) {
+    const s = state.sellers.find(x => x.id === id);
+    if (!s) return;
+    state.ui.editingSellerId = id;
+    state.ui.sellerFormName = s.name;
+    state.ui.sellerFormPin = s.pin;
+    state.ui.sellerFormError = "";
+    state.ui.showSellerForm = true;
+    render();
+  },
+  closeSellerForm() { state.ui.showSellerForm = false; render(); },
+  setSellerFormName(v) { state.ui.sellerFormName = v; },
+  setSellerFormPin(v) { state.ui.sellerFormPin = v; },
+  saveSellerForm() {
+    const name = (state.ui.sellerFormName || "").trim();
+    const pin = (state.ui.sellerFormPin || "").trim();
+    if (!name) { state.ui.sellerFormError = "Введите имя продавца"; render(); return; }
+    if (!pin) { state.ui.sellerFormError = "Введите код продавца"; render(); return; }
+
+    if (state.ui.editingSellerId) {
+      const s = state.sellers.find(x => x.id === state.ui.editingSellerId);
+      if (s) { s.name = name; s.pin = pin; }
+    } else {
+      state.sellers.push({ id: uid(), name, pin, createdAt: Date.now() });
+    }
+    persist();
+    state.ui.showSellerForm = false;
+    state.ui.toastSuccess = "Данные продавца сохранены";
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3000);
+  },
+  deleteSeller(id) {
+    if (state.sellers.length <= 1) { alert("Нельзя удалить единственного продавца"); return; }
+    const s = state.sellers.find(x => x.id === id);
+    if (!confirm(`Удалить продавца "${s ? s.name : ""}"?`)) return;
+    state.sellers = state.sellers.filter(x => x.id !== id);
+    persist(); render();
+  },
+
+  // Approvals (in-app, admin only)
+  confirmNewMedicine(id) {
+    if (!isAdmin()) return;
+    const m = state.meds.find(x => x.id === id);
+    if (!m) return;
+    const input = document.getElementById(`np_${id}`);
+    const newPrice = input ? parseFloat(String(input.value).replace(",", ".")) : m.price;
+    if (!isNaN(newPrice) && newPrice >= 0) m.price = newPrice;
+    m.priceUnconfirmed = false;
+    persist();
+    if (state.settings.telegramNotifyNewMeds) {
+      tgSendMessage(`✅ <b>Одобрено!</b>\nЛекарство «${escapeHtml(m.name)}» по цене ${fmtPrice(m.price)} подтверждено.`);
+    }
+    state.ui.toastSuccess = "Цена подтверждена!";
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3000);
+  },
+  rejectNewMedicine(id) {
+    if (!isAdmin()) return;
+    const m = state.meds.find(x => x.id === id);
+    if (!confirm(`Удалить «${m ? m.name : ""}» со склада?`)) return;
+    state.meds = state.meds.filter(x => x.id !== id);
+    persist();
+    if (m && state.settings.telegramNotifyNewMeds) {
+      tgSendMessage(`❌ <b>Отклонено!</b>\nЛекарство «${escapeHtml(m.name)}» удалено со склада.`);
+    }
+    render();
+  },
+  confirmPriceRequest(reqId) {
+    if (!isAdmin()) return;
+    const r = state.priceRequests.find(x => x.id === reqId);
+    if (!r) return;
+    const input = document.getElementById(`pr_${reqId}`);
+    const newPrice = input ? parseFloat(String(input.value).replace(",", ".")) : r.newPrice;
+    const med = state.meds.find(x => x.id === r.medicineId);
+    if (med && !isNaN(newPrice) && newPrice >= 0) med.price = newPrice;
+    state.priceRequests = state.priceRequests.filter(x => x.id !== reqId);
+    persist();
+    if (state.settings.telegramNotifyNewMeds) {
+      tgSendMessage(`✅ <b>Новая цена одобрена!</b>\n${escapeHtml(r.name)}: новая цена ${fmtPrice(med ? med.price : newPrice)}.`);
+    }
+    state.ui.toastSuccess = "Цена подтверждена!";
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3000);
+  },
+  rejectPriceRequest(reqId) {
+    if (!isAdmin()) return;
+    const r = state.priceRequests.find(x => x.id === reqId);
+    if (!r) return;
+    state.priceRequests = state.priceRequests.filter(x => x.id !== reqId);
+    persist();
+    if (state.settings.telegramNotifyNewMeds) {
+      tgSendMessage(`❌ <b>Изменение цены отклонено!</b>\n${escapeHtml(r.name)}: цена остаётся ${fmtPrice(r.oldPrice)}.`);
+    }
+    render();
+  },
+
+  // Fast Sell
+  openFastSell(id) {
+    state.ui.sellingMedId = id;
+    state.ui.sellQty = "1";
+    state.ui.formError = "";
+    state.ui.showSellSheet = true;
+    render();
+  },
+  closeFastSell() { state.ui.showSellSheet = false; render(); },
+  confirmFastSell() {
+    const id = state.ui.sellingMedId;
+    const m = state.meds.find(x => x.id === id);
+    if (!m) return;
+    const qty = parseInt(state.ui.sellQty, 10);
+    if (isNaN(qty) || qty <= 0) { state.ui.formError = "Укажите количество для продажи"; render(); return; }
+    if (qty > m.qty) { state.ui.formError = "На складе осталось всего " + m.qty + " " + m.unit; render(); return; }
+
+    m.qty -= qty;
+    const currentSeller = state.ui.currentSeller;
+    const sellerId = currentSeller ? currentSeller.id : "admin";
+    const sellerName = currentSeller ? currentSeller.name : "Администратор";
+
+    const total = m.price * qty;
+    state.sales.push({
+      id: uid(),
+      medicineId: m.id,
+      name: m.name,
+      price: m.price,
+      qty,
+      total: total,
+      sellerId,
+      sellerName,
+      timestamp: Date.now()
+    });
+
+    persist();
+    state.ui.showSellSheet = false;
+    state.ui.toastSuccess = "Продано: " + qty + " " + m.unit + " (" + fmtPrice(total) + ") · " + sellerName;
+
+    // Telegram notification
+    if (state.settings.telegramNotifySales) {
+      tgSendMessage(
+        `💰 <b>Новая продажа на кассе!</b>\n\n` +
+        `💊 <b>Товар:</b> ${escapeHtml(m.name)}\n` +
+        `📦 <b>Количество:</b> ${qty} ${escapeHtml(m.unit)}\n` +
+        `💵 <b>Сумма:</b> ${fmtPrice(total)}\n` +
+        `👤 <b>Продавец:</b> ${escapeHtml(sellerName)}\n` +
+        `📊 <b>Осталось на складе:</b> ${m.qty} ${escapeHtml(m.unit)}`
+      );
+    }
+
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3500);
+  },
+
+  // Medicines Management
+  openAddForm() {
+    state.ui.editingId = null;
+    state.ui.form = {
+      name: "",
+      manufacturer: "",
+      country: "",
+      price: "",
+      qty: "",
+      unit: "уп.",
+      category: DEFAULT_CATEGORIES[0],
+      photo: null
+    };
+    state.ui.formError = "";
+    state.ui.newCategoryMode = false;
+    state.ui.newCategoryName = "";
+    state.ui.showForm = true;
+    render();
+  },
+  openItem(id) {
+    const m = state.meds.find(x => x.id === id);
+    if (!m) return;
+    state.ui.editingId = id;
+    state.ui.form = {
+      name: m.name,
+      manufacturer: m.manufacturer || "",
+      country: m.country || "",
+      price: String(m.price),
+      qty: String(m.qty),
+      unit: m.unit || "уп.",
+      category: m.category || DEFAULT_CATEGORIES[0],
+      photo: m.photo || null
+    };
+    state.ui.formError = "";
+    state.ui.newCategoryMode = false;
+    state.ui.newCategoryName = "";
+    state.ui.showForm = true;
+    render();
+  },
+  closeForm() { state.ui.showForm = false; render(); },
+  setForm(field, v) { state.ui.form[field] = v; },
+  pickPhoto() { document.getElementById("medPhotoInput").click(); },
+  removePhoto() { state.ui.form.photo = null; render(); },
+  onCategoryChange(v) {
+    if (v === "__new__") { state.ui.newCategoryMode = true; render(); }
+    else { state.ui.form.category = v; }
+  },
+  setNewCategoryName(v) { state.ui.newCategoryName = v; },
+  cancelNewCategory() { state.ui.newCategoryMode = false; state.ui.newCategoryName = ""; render(); },
+
+  submitForm() {
+    const f = state.ui.form;
+    const name = f.name.trim();
+    const manufacturer = (f.manufacturer || "").trim();
+    const country = (f.country || "").trim();
+    const price = parseFloat(String(f.price).replace(",", "."));
+    const qty = parseInt(f.qty, 10);
+    const category = state.ui.newCategoryMode ? state.ui.newCategoryName.trim() : f.category;
+
+    if (!name) { state.ui.formError = "Введите название лекарства"; render(); return; }
+    if (isNaN(price) || price < 0) { state.ui.formError = "Введите корректную цену"; render(); return; }
+    if (isNaN(qty) || qty < 0) { state.ui.formError = "Введите количество"; render(); return; }
+    if (!category) { state.ui.formError = "Выберите категорию"; render(); return; }
+
+    if (state.ui.newCategoryMode && !state.settings.customCategories.includes(category)) {
+      state.settings.customCategories.push(category);
+    }
+    const admin = isAdmin();
+    const currentUserName = getCurrentUserName();
+
+    if (state.ui.editingId) {
+      const m = state.meds.find(x => x.id === state.ui.editingId);
+      const oldQty = m.qty;
+      const oldPrice = m.price;
+      const priceChanged = price !== oldPrice;
+      const needsApproval = priceChanged && !admin;
+
+      Object.assign(m, {
+        name,
+        manufacturer,
+        country,
+        // Если цену меняет продавец — старая цена остаётся, пока админ не одобрит
+        price: needsApproval ? oldPrice : price,
+        qty,
+        unit: f.unit,
+        category,
+        photo: f.photo || null
+      });
+
+      if (qty > oldQty) {
+        state.logs.push({
+          id: uid(),
+          type: 'restock',
+          medicineName: m.name,
+          qty: qty - oldQty,
+          unit: m.unit,
+          price: m.price,
+          by: currentUserName,
+          timestamp: Date.now()
+        });
+      }
+
+      if (needsApproval) {
+        // Создаём заявку на подтверждение новой цены
+        const reqId = uid();
+        state.priceRequests = state.priceRequests.filter(r => r.medicineId !== m.id); // одна активная заявка на товар
+        state.priceRequests.push({
+          id: reqId,
+          medicineId: m.id,
+          name: m.name,
+          oldPrice,
+          newPrice: price,
+          requestedBy: currentUserName,
+          timestamp: Date.now()
+        });
+
+        if (state.settings.telegramNotifyNewMeds) {
+          const text = `🔔 <b>Запрос на изменение цены!</b>\n\n` +
+            `💊 <b>Товар:</b> ${escapeHtml(m.name)}\n` +
+            `💰 <b>Старая цена:</b> ${fmtPrice(oldPrice)}\n` +
+            `💰 <b>Новая цена:</b> ${fmtPrice(price)}\n` +
+            `👤 <b>Запросил:</b> ${escapeHtml(currentUserName)}\n\n` +
+            `<i>Подтвердить новую цену?</i>`;
+          const keyboard = [
+            [
+              { text: "✅ Одобрить цену", callback_data: `appr_pr_${reqId}` },
+              { text: "❌ Отклонить", callback_data: `rej_pr_${reqId}` }
+            ]
+          ];
+          tgSendMessage(text, keyboard);
+        }
+
+        state.ui.toastSuccess = "Товар обновлен! Изменение цены отправлено на подтверждение администратору";
+      } else {
+        state.ui.toastSuccess = "Товар обновлен!";
+      }
+    } else {
+      const newMed = {
+        id: uid(),
+        name,
+        manufacturer,
+        country,
+        price,
+        qty,
+        unit: f.unit,
+        category,
+        photo: f.photo || null,
+        addedBy: currentUserName,
+        addedAt: Date.now()
+      };
+      if (!admin) newMed.priceUnconfirmed = true;
+      state.meds.unshift(newMed);
+
+      state.logs.push({
+        id: uid(),
+        type: 'add_med',
+        medicineName: name,
+        qty,
+        unit: f.unit,
+        price,
+        by: currentUserName,
+        timestamp: Date.now()
+      });
+
+      // Send to Telegram with APPROVE / REJECT buttons for admin's phone!
+      if (state.settings.telegramNotifyNewMeds) {
+        const text = `🔔 <b>Новое лекарство от сотрудника!</b>\n\n` +
+          `💊 <b>Название:</b> ${escapeHtml(name)}\n` +
+          (manufacturer ? `🏭 <b>Производитель:</b> ${escapeHtml(manufacturer)}\n` : "") +
+          (country ? `🌍 <b>Страна:</b> ${escapeHtml(country)}\n` : "") +
+          `💰 <b>Цена:</b> ${fmtPrice(price)}\n` +
+          `📦 <b>Остаток:</b> ${qty} ${escapeHtml(f.unit)}\n` +
+          `👤 <b>Добавил:</b> ${escapeHtml(currentUserName)}\n\n` +
+          `<i>Подтвердить цену и разрешить продажу?</i>`;
+
+        const keyboard = [
+          [
+            { text: "✅ Одобрить цену", callback_data: `appr_med_${newMed.id}` },
+            { text: "❌ Отклонить", callback_data: `rej_med_${newMed.id}` }
+          ]
+        ];
+        tgSendMessage(text, keyboard);
+      }
+
+      state.ui.toastSuccess = !admin ? "Лекарство добавлено! Запрос отправлен в Telegram администратора" : "Новое лекарство добавлено на склад!";
+    }
+
+    persist();
+    state.ui.showForm = false;
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3500);
+  },
+
+  deleteMedicine(id) {
+    if (!isAdmin()) return;
+    state.meds = state.meds.filter(m => m.id !== id);
+    persist();
+    state.ui.showForm = false;
+    render();
+  },
+
+  setSellQty(v) { state.ui.sellQty = v; },
+
+  // Settings
+  openSettings() { state.ui.showSettings = true; render(); },
+  closeSettings() { state.ui.showSettings = false; render(); },
+  setThreshold(v) { state.settings.threshold = Math.max(0, parseInt(v||"0",10)); persist(); render(); },
+  setPwCurrent(v) { state.ui.pwCurrent = v; },
+  setPwNew(v) { state.ui.pwNew = v; },
+  changeAdminPassword() {
+    const current = state.settings.adminPassword || "admin";
+    const newVal = (state.ui.pwNew || "").trim();
+    if (!newVal) { state.ui.pwError = "Введите новый пароль"; render(); return; }
+    if (state.ui.pwCurrent !== current) {
+      state.ui.pwError = "Текущий пароль указан неверно"; render(); return; }
+    state.settings.adminPassword = newVal;
+    state.ui.pwCurrent = ""; state.ui.pwNew = ""; state.ui.pwError = "";
+    persist();
+    state.ui.toastSuccess = "Пароль администратора обновлен";
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3000);
+  },
+  setMasterPwCurrent(v) { state.ui.masterPwCurrent = v; },
+  setMasterPwNew(v) { state.ui.masterPwNew = v; },
+  changeMasterPassword() {
+    const current = state.settings.masterPassword || "master2024";
+    const newVal = (state.ui.masterPwNew || "").trim();
+    if (!newVal) { state.ui.masterPwError = "Введите новый мастер-пароль"; render(); return; }
+    if (state.ui.masterPwCurrent !== current) {
+      state.ui.masterPwError = "Текущий мастер-пароль указан неверно"; render(); return; }
+    state.settings.masterPassword = newVal;
+    state.ui.masterPwCurrent = ""; state.ui.masterPwNew = ""; state.ui.masterPwError = "";
+    persist();
+    state.ui.toastSuccess = "Мастер-пароль обновлен";
+    render();
+    setTimeout(() => { state.ui.toastSuccess = ""; render(); }, 3000);
+  },
+
+  // Backup & Restore
+  exportData() {
+    const data = {
+      meds: state.meds,
+      sales: state.sales,
+      settings: state.settings,
+      priceRequests: state.priceRequests,
+      sellers: state.sellers,
+      sessions: state.sessions,
+      logs: state.logs,
+      exportedAt: Date.now()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "аптека_база_" + new Date().toISOString().slice(0,10) + ".json";
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+  pickRestoreFile() { document.getElementById("restoreFileInput").click(); },
+  clearToast() { state.ui.scanError = ""; state.ui.toastSuccess = ""; render(); },
+
+  startScan() {
+    if (state.ui.scanning) return;
+    document.getElementById("medPhotoInput").click();
+  }
+};
+
+// Image resize utility
+function resizeImage(file, maxSize = 600, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width, height = img.height;
+        if (width > height && width > maxSize) { height = Math.round(height * maxSize / width); width = maxSize; }
+        else if (height >= width && height > maxSize) { width = Math.round(width * maxSize / height); height = maxSize; }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("image load failed"));
+      img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error("read failed"));
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById("medPhotoInput").addEventListener("change", async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    const dataUrl = await resizeImage(file);
+    state.ui.form.photo = dataUrl;
+    render();
+  } catch (err) {
+    state.ui.formError = "Не удалось загрузить фото";
+    render();
+  }
+});
+
+document.getElementById("restoreFileInput").addEventListener("change", (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (data.meds) state.meds = data.meds;
+      if (data.sales) state.sales = data.sales;
+      if (data.settings) state.settings = Object.assign(state.settings, data.settings);
+      if (data.priceRequests) state.priceRequests = data.priceRequests;
+      if (data.sellers) state.sellers = data.sellers;
+      if (data.sessions) state.sessions = data.sessions;
+      if (data.logs) state.logs = data.logs;
+      persist();
+      state.ui.toastSuccess = "База данных успешно восстановлена!";
+      render();
+    } catch(err) {
+      alert("Ошибка при чтении файла резервной копии: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+// Initial render
+render();
+</script>
+</body>
+</html>

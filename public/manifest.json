@@ -1,0 +1,27 @@
+{
+  "name": "Склад аптеки",
+  "short_name": "Аптека",
+  "description": "Приложение для управления складом аптеки",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F8F9FA",
+  "theme_color": "#1F4B43",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192.png?text=Аптека",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512.png?text=Аптека",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "ru",
+  "dir": "ltr"
+}
